@@ -159,10 +159,10 @@ public class Validator
     {
         final FileConfiguration config = cf;
         final boolean hasLobby = config.isSet(ArenaConfigStrings.ARENAS_PREFIX + arena + ".lobby");
-        final boolean hasSpawn0 = config.isSet(ArenaConfigStrings.ARENAS_PREFIX + arena + ".spawns.spawn0");
-        if (!hasLobby || !hasSpawn0)
+        //final boolean hasSpawn0 = config.isSet(ArenaConfigStrings.ARENAS_PREFIX + arena + ".spawns.spawn0");
+        if (!hasLobby /*|| !hasSpawn0*/)
         {
-            ArenaLogger.debug(ChatColor.AQUA + arena + " is invalid! lobby:" + hasLobby + " spawns.spawn0:" + hasSpawn0); //$NON-NLS-1$ //$NON-NLS-2$
+            ArenaLogger.debug(ChatColor.AQUA + arena + " is invalid! lobby:" + hasLobby/* + " spawns.spawn0:" + hasSpawn0*/); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
         }
         return true;
