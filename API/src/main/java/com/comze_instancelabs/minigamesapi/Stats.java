@@ -75,7 +75,7 @@ public class Stats
         final Player p = Bukkit.getPlayer(playername);
         if (p != null)
         {
-            this.pli.getSQLInstance().updateWinnerStats(p, count, true);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.pli.getSQLInstance().updateWinnerStats(p, count, true));
         }
         else
         {
@@ -92,7 +92,7 @@ public class Stats
         final Player p = Bukkit.getPlayer(playername);
         if (p != null)
         {
-            this.pli.getSQLInstance().updateLoserStats(p);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.pli.getSQLInstance().updateLoserStats(p));
         }
         else
         {
@@ -115,14 +115,20 @@ public class Stats
         if (this.pli.getStatsConfig().getConfig().isSet("players." + uuid + ".wins"))
         {
             final int wins = this.getWins(playername);
-            final int sqlwins = this.pli.getSQLInstance().getWins(p);
-            this.setWins(playername, Math.max(wins, sqlwins));
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+            {
+                final int sqlwins = pli.getSQLInstance().getWins(p);
+                Bukkit.getScheduler().runTask(this.plugin, () -> setWins(playername, Math.max(wins, sqlwins)));
+            });
         }
         if (this.pli.getStatsConfig().getConfig().isSet("players." + uuid + ".points"))
         {
             final int points = this.getPoints(playername);
-            final int sqlpoints = this.pli.getSQLInstance().getPoints(p);
-            this.setPoints(playername, Math.max(points, sqlpoints));
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+            {
+                final int sqlpoints = this.pli.getSQLInstance().getPoints(p);
+                Bukkit.getScheduler().runTask(this.plugin, () -> this.setPoints(playername, Math.max(points, sqlpoints)));
+            });
         }
     }
     
@@ -140,8 +146,10 @@ public class Stats
             {
                 this.plugin.getLogger().fine("" + a.temp_kill_count.get(p.getName())); //$NON-NLS-1$
             }
-            this.pli.getSQLInstance().updateKillerStats(p, a.temp_kill_count.get(p.getName()));
-            a.temp_kill_count.remove(p.getName());
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                this.pli.getSQLInstance().updateKillerStats(p, a.temp_kill_count.get(p.getName()));
+                a.temp_kill_count.remove(p.getName());
+            });
         }
         // death stats
         if (a.temp_death_count.containsKey(p.getName()))
@@ -150,8 +158,10 @@ public class Stats
             {
                 this.plugin.getLogger().fine("" + a.temp_death_count.get(p.getName())); //$NON-NLS-1$
             }
-            this.pli.getSQLInstance().updateDeathStats(p, a.temp_death_count.get(p.getName()));
-            a.temp_death_count.remove(p.getName());
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                this.pli.getSQLInstance().updateDeathStats(p, a.temp_death_count.get(p.getName()));
+                a.temp_death_count.remove(p.getName());
+            });
         }
     }
     
