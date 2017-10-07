@@ -266,6 +266,7 @@ public class Rewards
         {
             final PluginInstance pli = MinigamesAPI.getAPI().getPluginInstance(this.plugin);
             final Player p = Bukkit.getPlayer(p_);
+            final boolean send_outcome_messages = this.plugin.getConfig().getBoolean(ArenaConfigStrings.CONFIG_SEND_OUTCOME_MESSAGES);
             if (!pli.global_lost.containsKey(p_))
             {
                 String received_rewards_msg = pli.getMessagesConfig().you_received_rewards;
@@ -324,22 +325,25 @@ public class Rewards
                 
                 try
                 {
-                    if (this.plugin.getConfig().getBoolean(ArenaConfigStrings.CONFIG_BROADCAST_WIN))
+                    if (send_outcome_messages)
                     {
-                        final String msgs[] = pli.getMessagesConfig().server_broadcast_winner.replaceAll("<player>", p_).replaceAll("<arena>", a.getInternalName()).split(";");
-                        for (final String msg : msgs)
+                        if (this.plugin.getConfig().getBoolean(ArenaConfigStrings.CONFIG_BROADCAST_WIN))
                         {
-                            Bukkit.getServer().broadcastMessage(msg);
-                        }
-                    }
-                    else
-                    {
-                        final String msgs[] = pli.getMessagesConfig().server_broadcast_winner.replaceAll("<player>", p_).replaceAll("<arena>", a.getInternalName()).split(";");
-                        for (final String playername : players)
-                        {
-                            if (Validator.isPlayerOnline(playername))
+                            final String msgs[] = pli.getMessagesConfig().server_broadcast_winner.replaceAll("<player>", p_).replaceAll("<arena>", a.getInternalName()).split(";");
+                            for (final String msg : msgs)
                             {
-                                Bukkit.getPlayer(playername).sendMessage(msgs);
+                                Bukkit.getServer().broadcastMessage(msg);
+                            }
+                        }
+                        else
+                        {
+                            final String msgs[] = pli.getMessagesConfig().server_broadcast_winner.replaceAll("<player>", p_).replaceAll("<arena>", a.getInternalName()).split(";");
+                            for (final String playername : players)
+                            {
+                                if (Validator.isPlayerOnline(playername))
+                                {
+                                    Bukkit.getPlayer(playername).sendMessage(msgs);
+                                }
                             }
                         }
                     }
@@ -348,13 +352,16 @@ public class Rewards
                 {
                     this.plugin.getLogger().log(Level.WARNING, "Could not find arena for broadcast. ", e);
                 }
-                
-                Util.sendMessage(this.plugin, p, pli.getMessagesConfig().you_won);
-                Util.sendMessage(this.plugin, p, received_rewards_msg);
-                if (this.plugin.getConfig().getBoolean(ArenaConfigStrings.CONFIG_EFFECTS_1_8_TITLES) && MinigamesAPI.SERVER_VERSION.isAfter(MinecraftVersionsType.V1_7))
+
+                if (send_outcome_messages)
                 {
-                    Effects.playTitle(p, pli.getMessagesConfig().you_won, 0);
+                    Util.sendMessage(this.plugin, p, pli.getMessagesConfig().you_won);
+                    if (this.plugin.getConfig().getBoolean(ArenaConfigStrings.CONFIG_EFFECTS_1_8_TITLES) && MinigamesAPI.SERVER_VERSION.isAfter(MinecraftVersionsType.V1_7))
+                    {
+                        Effects.playTitle(p, pli.getMessagesConfig().you_won, 0);
+                    }
                 }
+                Util.sendMessage(this.plugin, p, received_rewards_msg);
                 
                 // Participation Rewards
                 if (this.participation_economyrewards)
@@ -376,10 +383,13 @@ public class Rewards
             }
             else
             {
-                Util.sendMessage(this.plugin, p, pli.getMessagesConfig().you_lost);
-                if (this.plugin.getConfig().getBoolean(ArenaConfigStrings.CONFIG_EFFECTS_1_8_TITLES) && MinigamesAPI.SERVER_VERSION.isAfter(MinecraftVersionsType.V1_7))
+                if (send_outcome_messages)
                 {
-                    Effects.playTitle(p, pli.getMessagesConfig().you_lost, 0);
+                    Util.sendMessage(this.plugin, p, pli.getMessagesConfig().you_lost);
+                    if (this.plugin.getConfig().getBoolean(ArenaConfigStrings.CONFIG_EFFECTS_1_8_TITLES) && MinigamesAPI.SERVER_VERSION.isAfter(MinecraftVersionsType.V1_7))
+                    {
+                        Effects.playTitle(p, pli.getMessagesConfig().you_lost, 0);
+                    }
                 }
                 MinigamesAPI.getAPI().getPluginInstance(this.plugin).getStatsInstance().lose(p_);
             }

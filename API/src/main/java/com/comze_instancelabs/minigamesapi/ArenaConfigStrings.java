@@ -183,6 +183,8 @@ public interface ArenaConfigStrings
     String CONFIG_MAP_ROTATION = "config.map_rotation"; //$NON-NLS-1$
     /** TODO: describe config option. */
     String CONFIG_BROADCAST_WIN = "config.broadcast_win"; //$NON-NLS-1$
+    /** flag to enable sending outcome messages to players */
+    String CONFIG_SEND_OUTCOME_MESSAGES = "config.send_outcome_messages"; //$NON-NLS-1$
     /** TODO: describe config option. */
     String CONFIG_BUY_CLASSES_FOREVER = "config.buy_classes_forever"; //$NON-NLS-1$
     /** TODO: describe config option. */
@@ -293,5 +295,4 @@ public interface ArenaConfigStrings
      * Activation of gamemode reset on leave.
      */
     String RESET_GAMEMMODE = "config.reset_on_leave.gamemode"; //$NON-NLS-1$
-    
 }
