@@ -1027,10 +1027,14 @@ public class Arena
                 if (this.ai == null && this.getAllPlayers().size() > this.min_players - 1)
                 {
                     this.startLobby(this.temp_countdown);
+                    p.setExp(1.0f);
+                    p.setLevel(999);
                 }
                 else if (this.ai != null)
                 {
                     this.startLobby(this.temp_countdown);
+                    p.setExp(1.0f);
+                    p.setLevel(999);
                 }
             }
             else
@@ -1123,21 +1127,7 @@ public class Arena
                         // cancel starting
                         this.setArenaState(ArenaState.JOIN);
                         Util.updateSign(this.plugin, this);
-                        try
-                        {
-                            Bukkit.getScheduler().cancelTask(this.currenttaskid);
-                        }
-                        catch (@SuppressWarnings("unused") final Exception e)
-                        {
-                            // silently ignore
-                        }
-                        for (final String p_ : this.getAllPlayers())
-                        {
-                            if (Validator.isPlayerOnline(p_))
-                            {
-                                Util.sendMessage(this.plugin, Bukkit.getPlayer(p_), this.pli.getMessagesConfig().cancelled_starting);
-                            }
-                        }
+                        cancelLobbyCountdown(this);
                         return;
                     }
                     this.stopArena();
@@ -1694,6 +1684,32 @@ public class Arena
                 {
                     p2.setLevel(Arena.this.currentlobbycount);
                 }
+            }
+        }
+    }
+
+    protected void cancelLobbyCountdown(final Arena a)
+    {
+        try
+        {
+            Bukkit.getScheduler().cancelTask(this.currenttaskid);
+            a.currentlobbycount = a.pli.getLobbyCountdown();
+        }
+        catch (@SuppressWarnings("unused") final Exception e)
+        {
+            // silently ignore
+        }
+        for (final String p_ : a.getAllPlayers())
+        {
+            if (Validator.isPlayerOnline(p_))
+            {
+                final Player p = Bukkit.getPlayer(p_);
+                p.setExp(1.0f);
+                if (a.pli.use_xp_bar_level)
+                {
+                    p.setLevel(999);
+                }
+                Util.sendMessage(this.plugin, p, this.pli.getMessagesConfig().cancelled_starting);
             }
         }
     }
